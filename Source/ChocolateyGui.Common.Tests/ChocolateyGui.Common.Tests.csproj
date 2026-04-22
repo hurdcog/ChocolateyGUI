@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <LangVersion>7.1</LangVersion>
+    <Configurations>Debug;Release;ReleaseOfficial</Configurations>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <OutputPath>bin\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseOfficial|AnyCPU'">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\ReleaseOfficial\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(CHOCOLATEYGUI_OFFICIAL_KEY)' == '' OR !Exists('$(CHOCOLATEYGUI_OFFICIAL_KEY')">
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\chocolateygui.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(CHOCOLATEYGUI_OFFICIAL_KEY)' != '' AND Exists('$(CHOCOLATEYGUI_OFFICIAL_KEY)')">
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(CHOCOLATEYGUI_OFFICIAL_KEY)</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ChocolateyGui.Common\ChocolateyGui.Common.csproj" />
+  </ItemGroup>
+  <!-- Generate a stub SolutionVersion.cs when the Cake build has not yet produced one. -->
+  <!-- The %3B sequences are MSBuild-escaped semicolons (literal ; in C# source). -->
+  <!-- Assembly attributes do NOT have trailing semicolons - only the using clause does. -->
+  <Target Name="GenerateSolutionVersionStub" BeforeTargets="BeforeBuild" Condition="!Exists('$(MSBuildThisFileDirectory)..\SolutionVersion.cs')">
+    <WriteLinesToFile
+      File="$(MSBuildThisFileDirectory)..\SolutionVersion.cs"
+      Lines="// Auto-generated stub - overwritten by the Cake build when building for release.;using System.Reflection%3B;[assembly: AssemblyVersion(&quot;0.0.0.0&quot;)];[assembly: AssemblyFileVersion(&quot;0.0.0.0&quot;)];[assembly: AssemblyInformationalVersion(&quot;0.0.0-dev&quot;)]"
+      Overwrite="false"
+      Encoding="UTF-8" />
+  </Target>
+</Project>
